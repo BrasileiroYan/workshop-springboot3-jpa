@@ -1,8 +1,10 @@
 package com.example.course.entities;
 
 import jakarta.persistence.*;
-
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_product")
@@ -16,20 +18,19 @@ public class Product implements Serializable {
     private Double price;
     private String imgUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category categories;
+    @ManyToMany
+    @JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories = new HashSet<>();
 
     public Product() {
     }
 
-    public Product(Long id, String name, String description, Double price, String imgUrl, Category categories) {
+    public Product(Long id, String name, String description, Double price, String imgUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imgUrl = imgUrl;
-        this.categories = categories;
     }
 
     public Long getId() {
@@ -72,11 +73,19 @@ public class Product implements Serializable {
         this.imgUrl = imgUrl;
     }
 
-    public Category getCategories() {
+    public Set<Category> getCategories() {
         return categories;
     }
 
-    public void setCategories(Category categories) {
-        this.categories = categories;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
